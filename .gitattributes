@@ -1,3 +1,4 @@
 chessengines/mac/chessengines.zip filter=lfs diff=lfs merge=lfs -text
 chessengines/ubuntu/chessengines.zip filter=lfs diff=lfs merge=lfs -text
 chessengines/windows/chessengines.zip filter=lfs diff=lfs merge=lfs -text
+chesscoin-qt/src/version.cpp export-subst
