@@ -1,1 +1,2 @@
 chessengines/mac/chessengines.zip filter=lfs diff=lfs merge=lfs -text
+chessengines/ubuntu/chessengines.zip filter=lfs diff=lfs merge=lfs -text
