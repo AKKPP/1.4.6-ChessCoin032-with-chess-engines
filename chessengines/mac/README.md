@@ -1,6 +1,6 @@
 ## Required
 
-- Default location for chess engines on macos is Documents directory.
+- Default location for chess engines on macos is <b>Documents</b> directory.
 
   For example: if your user's name is akkpp, default location is follows /Users/akkpp/Documents
 
