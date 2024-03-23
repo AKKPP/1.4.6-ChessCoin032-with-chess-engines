@@ -435,7 +435,8 @@ bool SetStartOnSystemStartup(bool fAutoStart)
 
         std::string datapath = GetAutostartDir().string();
         //chmod(datapath.c_str(), 755); // S_IRWXU = 448
-        string cmd = "sudo chmod -R a+rwx ";
+        //string cmd = "sudo chmod -R a+rwx ";
+        string cmd = "chmod -R a+rwx ";
         cmd += datapath;
         system(cmd.c_str());
 
@@ -454,7 +455,8 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         optionFile << "Categories=Application\n";
         optionFile.close();
 
-        cmd = "sudo chmod -R a+rwx ";
+        //cmd = "sudo chmod -R a+rwx ";
+        cmd = "chmod -R a+rwx ";
         cmd += GetAutostartFilePath().string();
         system(cmd.c_str());
     }

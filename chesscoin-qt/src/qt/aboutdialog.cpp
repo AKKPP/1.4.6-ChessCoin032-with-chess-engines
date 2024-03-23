@@ -10,15 +10,20 @@ AboutDialog::AboutDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint | Qt::WindowCloseButtonHint);
+
 #if (defined (WIN32) || defined (WIN64))
+    setMinimumSize(560, 250);
+    setMaximumSize(560, 250);
+    resize(560, 250);
+#elif (defined (LINUX) || defined (__linux__))
     setMinimumSize(600, 300);
     setMaximumSize(600, 300);
-#elif (defined (LINUX) || defined (__linux__))
-    setMinimumSize(600, 360);
-    setMaximumSize(600, 360);
+    resize(600, 300);
 #else
-    setMinimumSize(600, 390);
-    setMaximumSize(600, 390);
+    setMinimumSize(600, 350);
+    setMaximumSize(600, 350);
+    resize(600, 350);
 #endif
 }
 

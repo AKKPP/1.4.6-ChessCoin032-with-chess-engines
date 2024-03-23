@@ -60,6 +60,8 @@
 #include <QDragEnterEvent>
 #include <QUrl>
 #include <QStyle>
+#include <QProcess>
+#include <QWidgetAction>
 
 #include <iostream>
 
@@ -79,14 +81,20 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     trayIcon(0),
     notificator(0),
     rpcConsole(0),
-    aboutDialog(0),
     optionsDialog(0),
     nWeight(0)
 {
     //QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    resize(850, 550);
+#ifdef Q_OS_WIN
+    resize(850, 590);
+    setMinimumSize(800, 550);
+#else
+    resize(950, 660);
+    setMinimumSize(950, 660);
+#endif
+
     setWindowTitle(tr("ChessCoin 0.32%") + " - " + tr("Wallet"));
 
 #ifndef Q_OS_MAC
@@ -97,7 +105,6 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
 #endif
 
-    setMinimumSize(640, 550);
 
     // Accept D&D of URIs
     setAcceptDrops(true);
@@ -208,7 +215,6 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     rpcConsole = new RPCConsole(this);
     connect(openRPCConsoleAction, SIGNAL(triggered()), rpcConsole, SLOT(show()));
 
-    aboutDialog = new AboutDialog(0);
     optionsDialog = new OptionsDialog(0);
 
     // Clicking on "Verify Message" in the address book sends you to the verify message tab
@@ -228,7 +234,6 @@ BitcoinGUI::~BitcoinGUI()
 #endif
 
     delete rpcConsole;
-    delete aboutDialog;
     delete optionsDialog;
     delete signVerifyMessageDialog;
 }
@@ -328,6 +333,11 @@ void BitcoinGUI::createActions()
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
     openRPCConsoleAction->setIconVisibleInMenu(true);
 
+    chessPlayAction = new QAction(QIcon(":/icons/chess"), tr("&Play Chess"), this);
+    chessPlayAction->setToolTip(tr("Play Chess"));
+    chessPlayAction->setMenuRole(QAction::PreferencesRole);
+    chessPlayAction->setIconVisibleInMenu(true);
+
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -340,6 +350,8 @@ void BitcoinGUI::createActions()
     connect(lockWalletAction, SIGNAL(triggered()), this, SLOT(lockWallet()));
     connect(signMessageAction, SIGNAL(triggered()), this, SLOT(gotoSignMessageTab()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(gotoVerifyMessageTab()));
+
+    connect(chessPlayAction, SIGNAL(triggered()), this, SLOT(onPlayChess()));
 }
 
 void BitcoinGUI::createMenuBar()
@@ -374,21 +386,59 @@ void BitcoinGUI::createMenuBar()
     help->addSeparator();
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+
+#ifdef HELPCHESSMENU
+    chessMenuBar = new QMenuBar(this);
+    chessMenuBar->setStyleSheet("QMenuBar { border: none; color: lightgreen; }");
+    QMenu *chess = chessMenuBar->addMenu(tr("&Chess"));
+    chess->setStyleSheet("color: lightgreen;");
+    chess->addAction(chessPlayAction);
+    chessMenuBar->setGeometry(appMenuBar->width() + 58, appMenuBar->geometry().y() + 1, 100, appMenuBar->height() - 2);
+#else
+    QPushButton *popChessBtn = new QPushButton(tr("   &Chess   "));
+    popChessBtn->setStyleSheet("color: lightgreen;");
+    popChessBtn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    popChessBtn->setMinimumHeight(24);
+
+    QMenu *chessmenu = new QMenu(this);
+    chessmenu->setStyleSheet("color: lightgreen;");
+    chessmenu->addAction(chessPlayAction);
+    popChessBtn->setMenu(chessmenu);
+
+    appMenuBar->setCornerWidget(popChessBtn, Qt::Corner::TopRightCorner);
+#endif
 }
 
 void BitcoinGUI::createToolBars()
 {
-    QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    toolbar->addAction(overviewAction);
-    toolbar->addAction(sendCoinsAction);
-    toolbar->addAction(receiveCoinsAction);
-    toolbar->addAction(historyAction);
-    toolbar->addAction(addressBookAction);
+    mainToolBar = addToolBar(tr("Main toolbar"));
+    mainToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    mainToolBar->addAction(overviewAction);
+    mainToolBar->addAction(sendCoinsAction);
+    mainToolBar->addAction(receiveCoinsAction);
+    mainToolBar->addAction(historyAction);
+    mainToolBar->addAction(addressBookAction);
 
-    QToolBar *toolbar2 = addToolBar(tr("Actions toolbar"));
+#ifdef HELPCHESSMENU
+    QToolBar *toolbar2 = addToolBar(tr("Export toolbar"));
     toolbar2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     toolbar2->addAction(exportAction);
+#else
+    mainToolBar->addAction(exportAction);
+#endif
+
+    chessToolBar = addToolBar(tr("Chess toolbar"));
+    chessToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    chessToolBar->setStyleSheet("color: lightgreen;");
+    chessToolBar->addAction(chessPlayAction);
+
+    const QRect& rt = geometry();
+
+#ifdef Q_OS_WIN
+    mainToolBar->setMinimumWidth(rt.width() - 125);
+#else
+    mainToolBar->setMinimumWidth(rt.width() - 150);
+#endif
 }
 
 void BitcoinGUI::setClientModel(ClientModel *clientModel)
@@ -525,12 +575,9 @@ void BitcoinGUI::optionsClicked()
 
 void BitcoinGUI::aboutClicked()
 {
-    //AboutDialog dlg;
-    //dlg.setModel(clientModel);
-    //dlg.exec();
-    aboutDialog->setModel(clientModel);
-    aboutDialog->setWindowModality(Qt::ApplicationModal);
-    aboutDialog->show();
+    AboutDialog dlg;
+    dlg.setModel(clientModel);
+    dlg.exec();
 }
 
 void BitcoinGUI::setNumConnections(int count)
@@ -1049,4 +1096,38 @@ void BitcoinGUI::showRPCConsoleDebug()
         rpcConsole->show();
         rpcConsole->setTabFocus(0);
     }
+}
+
+void BitcoinGUI::onPlayChess()
+{
+    // Create a QProcess object
+    QProcess *process = new QProcess();
+
+    // Set the command you want to execute
+    QString program = "aichesscoingui.exe";
+    QStringList arguments; // If your executable requires arguments, add them here
+
+    // Start the process
+    process->start(program, arguments);
+
+    QObject::connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int, QProcess::ExitStatus) {
+        process->deleteLater(); // Delete QProcess object when finished
+        //process = NULL;
+    });
+
+    QObject::connect(qApp, &QCoreApplication::aboutToQuit, [&]() {
+        process->terminate(); // Kill the child process
+
+    });
+}
+
+void BitcoinGUI::resizeEvent(QResizeEvent *event)
+{
+    const QRect& rt = geometry();
+
+#ifdef Q_OS_WIN
+    mainToolBar->setMinimumWidth(rt.width() - 125);
+#else
+    mainToolBar->setMinimumWidth(rt.width() - 150);
+#endif
 }

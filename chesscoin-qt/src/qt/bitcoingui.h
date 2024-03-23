@@ -28,6 +28,7 @@ class QModelIndex;
 class QProgressBar;
 class QStackedWidget;
 class QUrl;
+class QToolBar;
 QT_END_NAMESPACE
 
 /**
@@ -56,6 +57,7 @@ protected:
     void closeEvent(QCloseEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
     void dropEvent(QDropEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 private:
     ClientModel *clientModel;
@@ -78,6 +80,13 @@ private:
     QProgressBar *progressBar;
 
     QMenuBar *appMenuBar;
+#ifdef HELPCHESSMENU
+    QMenuBar *chessMenuBar;
+#endif
+
+    QToolBar *mainToolBar;
+    QToolBar *chessToolBar;
+
     QAction *overviewAction;
     QAction *historyAction;
     QAction *quitAction;
@@ -97,12 +106,12 @@ private:
     QAction *lockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+    QAction *chessPlayAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
     TransactionView *transactionView;
     RPCConsole *rpcConsole;
-    AboutDialog *aboutDialog;
     OptionsDialog *optionsDialog;
 
     QMovie *syncIconMovie;
@@ -192,6 +201,8 @@ private slots:
     void updateStakingIcon();
 
     void showRPCConsoleDebug();
+
+    void onPlayChess();
 };
 
 #endif
