@@ -730,8 +730,8 @@ void BitcoinGUI::closeEvent(QCloseEvent *event)
     if(clientModel)
     {
 #ifndef Q_OS_MAC // Ignored on Mac
-        //if(!clientModel->getOptionsModel()->getMinimizeToTray() && !clientModel->getOptionsModel()->getMinimizeOnClose())
-        if (!clientModel->getOptionsModel()->getMinimizeOnClose())
+        if(!clientModel->getOptionsModel()->getMinimizeToTray() && !clientModel->getOptionsModel()->getMinimizeOnClose())
+        //if (!clientModel->getOptionsModel()->getMinimizeOnClose())
         {
             qApp->quit();
         }
