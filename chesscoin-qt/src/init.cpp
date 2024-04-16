@@ -498,8 +498,6 @@ bool AppInit2()
 
     fServer = GetBoolArg("-server");
 
-    fAutoSync = GetBoolArg("-autosync", false);
-
     /* force fServer when running without GUI */
 //#if !defined(QT_GUI) && defined(BUILD_DAEMON)
 //    fServer = true;
@@ -988,36 +986,27 @@ else
     int nPrevHeight = 0;
     int64_t prevtime = GetTime();
 
-    fAutoSync = GetBoolArg("-autosync", false);
-
     while (1)
     {
-        if (fAutoSync)
+        if (nBestHeight < totalblocks)
         {
-            if (nBestHeight < totalblocks)
+            if (nBestHeight != nPrevHeight)
             {
-                if (nBestHeight != nPrevHeight)
-                {
-                    nPrevHeight = nBestHeight;
-                    prevtime = GetTime();
-                    fSyncForceDueStuck = false;
-                }
-                else
-                {
-                    int64_t deltatime = GetTime() - prevtime;
-                    if (deltatime >= 32)
-                        fSyncForceDueStuck = true;
-                }
+                nPrevHeight = nBestHeight;
+                prevtime = GetTime();
+                fSyncForceDueStuck = false;
             }
-
-        	MilliSleep(4000);
-
-            totalblocks = GetNumBlocksOfPeers();
+            else
+            {
+                int64_t deltatime = GetTime() - prevtime;
+                if (deltatime >= 32)
+                    fSyncForceDueStuck = true;
+            }
         }
-        else
-        {
-            MilliSleep(5000);
-        }
+
+        MilliSleep(4000);
+
+        totalblocks = GetNumBlocksOfPeers();
     }
 #endif
 

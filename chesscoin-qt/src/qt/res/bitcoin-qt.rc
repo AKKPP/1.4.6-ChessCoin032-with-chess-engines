@@ -22,7 +22,7 @@ BEGIN
             VALUE "FileDescription",    "ChessCoin-Qt (OSS GUI client for ChessCoin 0.32%)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "chesscoin-qt"
-            VALUE "LegalCopyright",     "Copyright(c) 2023 The ChessCoin 0.32% developers"
+            VALUE "LegalCopyright",     "Copyright(c) 2024 The ChessCoin 0.32% developers"
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "chesscoin-qt.exe"
             VALUE "ProductName",        "ChessCoin-Qt"

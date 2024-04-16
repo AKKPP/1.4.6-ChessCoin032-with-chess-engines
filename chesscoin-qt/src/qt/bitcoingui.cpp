@@ -335,7 +335,6 @@ void BitcoinGUI::createActions()
 
     chessPlayAction = new QAction(QIcon(":/icons/chess"), tr("&Play Chess"), this);
     chessPlayAction->setToolTip(tr("Play Chess"));
-    chessPlayAction->setMenuRole(QAction::PreferencesRole);
     chessPlayAction->setIconVisibleInMenu(true);
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -359,6 +358,7 @@ void BitcoinGUI::createMenuBar()
 #ifdef Q_OS_MAC
     // Create a decoupled menu bar on Mac which stays even if the window is closed
     appMenuBar = new QMenuBar();
+    setMenuBar(appMenuBar);
 #else
     // Get the main window's menu bar on other platforms
     appMenuBar = menuBar();
@@ -387,13 +387,9 @@ void BitcoinGUI::createMenuBar()
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
 
-#ifdef HELPCHESSMENU
-    chessMenuBar = new QMenuBar(this);
-    chessMenuBar->setStyleSheet("QMenuBar { border: none; color: lightgreen; }");
-    QMenu *chess = chessMenuBar->addMenu(tr("&Chess"));
-    chess->setStyleSheet("color: lightgreen;");
+#ifdef Q_OS_MAC
+    QMenu *chess = appMenuBar->addMenu(tr("&Chess"));
     chess->addAction(chessPlayAction);
-    chessMenuBar->setGeometry(appMenuBar->width() + 58, appMenuBar->geometry().y() + 1, 100, appMenuBar->height() - 2);
 #else
     QPushButton *popChessBtn = new QPushButton(tr("   &Chess   "));
     popChessBtn->setStyleSheet("color: lightgreen;");
@@ -1104,7 +1100,14 @@ void BitcoinGUI::onPlayChess()
     QProcess *process = new QProcess();
 
     // Set the command you want to execute
+#if (defined Q_OS_WIN)
     QString program = "aichesscoingui.exe";
+#elif (defined Q_OS_MAC)
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    QString program = appDirPath + "/aichesscoingui";
+#else
+    QString program = "./aichesscoingui";
+#endif
     QStringList arguments; // If your executable requires arguments, add them here
 
     // Start the process
@@ -1113,11 +1116,6 @@ void BitcoinGUI::onPlayChess()
     QObject::connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=](int, QProcess::ExitStatus) {
         process->deleteLater(); // Delete QProcess object when finished
         //process = NULL;
-    });
-
-    QObject::connect(qApp, &QCoreApplication::aboutToQuit, [&]() {
-        process->terminate(); // Kill the child process
-
     });
 }
 

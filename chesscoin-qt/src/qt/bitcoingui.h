@@ -80,9 +80,6 @@ private:
     QProgressBar *progressBar;
 
     QMenuBar *appMenuBar;
-#ifdef HELPCHESSMENU
-    QMenuBar *chessMenuBar;
-#endif
 
     QToolBar *mainToolBar;
     QToolBar *chessToolBar;

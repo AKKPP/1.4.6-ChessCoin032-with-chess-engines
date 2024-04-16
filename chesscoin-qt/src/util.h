@@ -167,7 +167,6 @@ extern bool fNoListen;
 extern bool fLogTimestamps;
 extern bool fReopenDebugLog;
 extern bool fSyncForceDueStuck;
-extern bool fAutoSync;
 
 void RandAddSeed();
 void RandAddSeedPerfmon();

@@ -89,7 +89,6 @@ bool fLogTimestamps = false;
 CMedianFilter<int64_t> vTimeOffsets(200,0);
 bool fReopenDebugLog = false;
 bool fSyncForceDueStuck = false;
-bool fAutoSync = false;
 
 
 // print to debug.log
