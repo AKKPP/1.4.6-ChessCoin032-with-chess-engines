@@ -46,6 +46,7 @@
         <file alias="camera">res/icons/camera.png</file>
         <file alias="chess">res/icons/chess.png</file>
         <file alias="download">res/icons/download.png</file>
+		<file alias="delete">res/icons/delete.png</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>

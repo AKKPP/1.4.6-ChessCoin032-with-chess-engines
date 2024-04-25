@@ -104,6 +104,7 @@ private:
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
     QAction *chessPlayAction;
+    QAction *chessResetAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -200,6 +201,7 @@ private slots:
     void showRPCConsoleDebug();
 
     void onPlayChess();
+    void onResetChessEngineJson();
 };
 
 #endif

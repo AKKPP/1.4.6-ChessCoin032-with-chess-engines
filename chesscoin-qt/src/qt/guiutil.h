@@ -16,6 +16,7 @@ class QWidget;
 class QDateTime;
 class QUrl;
 class QAbstractItemView;
+class QMainWindow;
 QT_END_NAMESPACE
 class SendCoinsRecipient;
 
@@ -103,6 +104,8 @@ namespace GUIUtil
 
     bool GetStartOnSystemStartup();
     bool SetStartOnSystemStartup(bool fAutoStart);
+
+    void handleCloseWindowShortcut(QWidget* w);
 
     /** Help message for Bitcoin-Qt, shown with --help. */
     class HelpMessageBox : public QMessageBox

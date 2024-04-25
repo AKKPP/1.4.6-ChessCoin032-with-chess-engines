@@ -24,6 +24,8 @@
 #include <QLibraryInfo>
 #include <QSettings>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QTextStream>
 
 

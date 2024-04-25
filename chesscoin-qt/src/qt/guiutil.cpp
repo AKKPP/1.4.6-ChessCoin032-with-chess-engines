@@ -20,6 +20,9 @@
 #include <QThread>
 #include <QTextEdit>
 #include <QTextTable>
+#include <QVBoxLayout>
+#include <QMainWindow>
+#include <QShortcut>
 
 #if (defined (LINUX) || defined (_linux_))
 #include <sys/types.h>
@@ -287,6 +290,11 @@ void openDebugLogfile()
     /* Open debug.log with the associated application */
     if (boost::filesystem::exists(pathDebug))
         QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(pathDebug.string())));
+}
+
+void handleCloseWindowShortcut(QWidget* w)
+{
+    QObject::connect(new QShortcut(QKeySequence(QObject::tr("Ctrl+Q")), w), &QShortcut::activated, w, &QWidget::close);
 }
 
 ToolTipToRichTextFilter::ToolTipToRichTextFilter(int size_threshold, QObject *parent) :

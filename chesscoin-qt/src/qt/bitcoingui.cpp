@@ -62,6 +62,8 @@
 #include <QStyle>
 #include <QProcess>
 #include <QWidgetAction>
+#include <QSharedMemory>
+#include <QSettings>
 
 #include <iostream>
 
@@ -333,9 +335,13 @@ void BitcoinGUI::createActions()
     openRPCConsoleAction->setToolTip(tr("Open debugging and diagnostic console"));
     openRPCConsoleAction->setIconVisibleInMenu(true);
 
-    chessPlayAction = new QAction(QIcon(":/icons/chess"), tr("&Play Chess"), this);
+    chessPlayAction = new QAction(QIcon(":/icons/chess"), tr(" &Play Chess"), this);
     chessPlayAction->setToolTip(tr("Play Chess"));
     chessPlayAction->setIconVisibleInMenu(true);
+
+    chessResetAction = new QAction(QIcon(":/icons/delete"), tr("&Reset Configuration"), this);
+    chessResetAction->setToolTip(tr("Reset engine configuration"));
+    chessResetAction->setIconVisibleInMenu(true);
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
@@ -351,6 +357,7 @@ void BitcoinGUI::createActions()
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(gotoVerifyMessageTab()));
 
     connect(chessPlayAction, SIGNAL(triggered()), this, SLOT(onPlayChess()));
+    connect(chessResetAction, SIGNAL(triggered()), this, SLOT(onResetChessEngineJson()));
 }
 
 void BitcoinGUI::createMenuBar()
@@ -399,6 +406,7 @@ void BitcoinGUI::createMenuBar()
     QMenu *chessmenu = new QMenu(this);
     chessmenu->setStyleSheet("color: lightgreen;");
     chessmenu->addAction(chessPlayAction);
+    chessmenu->addAction(chessResetAction);
     popChessBtn->setMenu(chessmenu);
 
     appMenuBar->setCornerWidget(popChessBtn, Qt::Corner::TopRightCorner);
@@ -760,6 +768,8 @@ void BitcoinGUI::askFee(qint64 nFeeRequired, bool *payFee)
 
 void BitcoinGUI::incomingTransaction(const QModelIndex & parent, int start, int end)
 {
+    Q_UNUSED(end);
+
     if(!walletModel || !clientModel)
         return;
     TransactionTableModel *ttm = walletModel->getTransactionTableModel();
@@ -1096,6 +1106,15 @@ void BitcoinGUI::showRPCConsoleDebug()
 
 void BitcoinGUI::onPlayChess()
 {
+    // Unique identifier for the shared memory
+    const QString sharedMemoryKey = "{544A918C-6269-4FD4-A3EE-A49B3F148C2C}";
+    QSharedMemory sharedMemory(sharedMemoryKey);
+    if (!sharedMemory.create(1))
+    {
+        QMessageBox::critical(this, tr("Failed play chess"), tr("Another application is already running."));
+        return;
+    }
+
     // Create a QProcess object
     QProcess *process = new QProcess();
 
@@ -1119,8 +1138,40 @@ void BitcoinGUI::onPlayChess()
     });
 }
 
+void BitcoinGUI::onResetChessEngineJson()
+{
+    QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Reset configuration"),
+             tr("Are you sure you wish to delete engine configuration?"),
+             QMessageBox::Yes|QMessageBox::Cancel,
+             QMessageBox::Cancel);
+
+    if(retval != QMessageBox::Yes)
+        return;
+
+    // Get the path to the configuration file of aichesscoingui
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "aichesscoingui", "aichesscoingui");
+    QString configFilePath = settings.fileName();
+
+    QFileInfo fi(configFilePath);
+    QDir dir(fi.absolutePath());
+
+    QFile configFile(configFilePath);
+    if (!configFile.exists())
+        return;
+
+    if (dir.exists())
+    {
+        QString enginejsonpath = fi.absolutePath() + QString("/engines.json");
+        QFile jsonFile(enginejsonpath);
+        if (jsonFile.exists())
+            jsonFile.remove();
+    }
+}
+
 void BitcoinGUI::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event);
+
     const QRect& rt = geometry();
 
 #ifdef Q_OS_WIN
