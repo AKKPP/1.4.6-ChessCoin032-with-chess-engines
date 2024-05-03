@@ -2,7 +2,7 @@
 
 - Default location for chess engines on macos is <b>Documents</b> directory.
 
-  For example: if your user's name is akkpp, default location is follows /Users/akkpp/Documents
+  For example: if your user's name is admin, default location is follows /Users/admin/Documents
 
 - chessengines.zip file contains arasan, komodo and stockfish engines.
 
