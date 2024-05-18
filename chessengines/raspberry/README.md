@@ -2,7 +2,7 @@
 
 - Default location for chess engines on raspberry pi is Documents directory.
 
-  For example: if your user's name is akkpp, default location is follows /home/akkpp/Documents
+  For example: if your user's name is user, default location is follows /home/user/Documents
 
 - chessengines.zip file contains arasan and stockfish engines.
 
